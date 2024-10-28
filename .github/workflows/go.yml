@@ -119,11 +119,11 @@ jobs:
           aws s3api put-object \
              --body ${{ env.OUTPUT_ZIP }} \
              --bucket ${{ env.AWS_S3_BUCKET }} \
-             --key private-data/${{ github.event.repository.name }}/build/${{ env.OUTPUT_ZIP }} \
+             --key data/${{ github.event.repository.name }}/build/${{ env.OUTPUT_ZIP }} \
              --tagging "Dioad/Project=${{ github.event.repository.name }}&Dioad/Version=${{ github.ref_type }}/${{ github.ref_name }}&Dioad/Commit=${{ github.sha }}&Dioad/CommitDate=${{ env.COMMIT_DATE }}&Dioad/OS=${{ matrix.os }}&Dioad/Architecture=${{ matrix.arch }}" \
              --content-type "application/zip" \
              --server-side-encryption AES256
-          aws s3 cp ${{ env.OUTPUT_ZIP }}_SHA256SUMS s3://${{ env.AWS_S3_BUCKET }}/private-data/${{ github.event.repository.name }}/build/${{ env.OUTPUT_ZIP }}_SHA256SUMS \
+          aws s3 cp ${{ env.OUTPUT_ZIP }}_SHA256SUMS s3://${{ env.AWS_S3_BUCKET }}/data/${{ github.event.repository.name }}/build/${{ env.OUTPUT_ZIP }}_SHA256SUMS \
              --no-guess-mime-type \
              --content-type "text/plain" \
              --no-progress \
