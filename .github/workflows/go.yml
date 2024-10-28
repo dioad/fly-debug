@@ -56,13 +56,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ darwin, linux ]
+        os: [ linux ]
         arch: [ amd64 ]
-        include:
-          - os: linux
-            arch: arm64
-          - os: darwin
-            arch: arm64
 
     env:
       GOOS: ${{ matrix.os }}
