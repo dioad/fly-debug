@@ -27,7 +27,7 @@ func FlyValidator() (jwt.TokenValidator, error) {
 			EndpointConfig: oidc.EndpointConfig{
 				URL: "https://oidc.fly.io/pat-downey",
 			},
-			Audiences: []string{"account"},
+			Audiences: []string{"https://fly.io/pat-downey"},
 		},
 	}
 
