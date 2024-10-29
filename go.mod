@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/auth0/go-jwt-middleware/v2 v2.2.2
-	github.com/dioad/net v0.42.3
+	github.com/dioad/net v0.42.4
 	golang.org/x/oauth2 v0.23.0
 )
 
