@@ -17,7 +17,7 @@ import (
 
 type DebugStruct struct {
 	DecodedToken     interface{}                `json:",omitempty"`
-	Error            []string                   `json:",omitempty"`
+	Errors           []string                   `json:",omitempty"`
 	RegisteredClaims validator.RegisteredClaims `json:",omitempty"`
 }
 
@@ -51,24 +51,24 @@ func FlyDebug() http.HandlerFunc {
 		var token *oauth2.Token
 		tokenSource := flyio.NewTokenSource()
 
-		token, err = tokenSource.Token()
-
 		o := DebugStruct{}
+
+		token, err = tokenSource.Token()
 
 		if err != nil {
 			slog.Error("error getting token", "error", err)
-			o.Error = append(o.Error, fmt.Errorf("error getting token: %w", err).Error())
+			o.Errors = append(o.Errors, fmt.Errorf("error getting token: %w", err).Error())
 		}
 		if token != nil {
 			validatedResponse, err := v.ValidateToken(r.Context(), token.AccessToken)
 			if err != nil {
 				slog.Error("error validating token", "error", err)
-				o.Error = append(o.Error, fmt.Errorf("error validating token: %w", err).Error())
+				o.Errors = append(o.Errors, fmt.Errorf("error validating token: %w", err).Error())
 			} else {
 				rc, _, err := oidc.ExtractClaims[*oidc.IntrospectionResponse](validatedResponse)
 				if err != nil {
 					slog.Error("error extracting claims", "error", err)
-					o.Error = append(o.Error, fmt.Errorf("error extracting claims: %w", err).Error())
+					o.Errors = append(o.Errors, fmt.Errorf("error extracting claims: %w", err).Error())
 				} else {
 					o.RegisteredClaims = rc
 				}
