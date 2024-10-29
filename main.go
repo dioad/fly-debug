@@ -62,12 +62,12 @@ func FlyDebug() http.HandlerFunc {
 		if token != nil {
 			validatedResponse, err := v.ValidateToken(r.Context(), token.AccessToken)
 			if err != nil {
-				slog.Error("error validating token", "error", err)
-				o.Errors = append(o.Errors, fmt.Errorf("error validating token: %w", err).Error())
+				slog.Error("error validating token", "error", err, "token", token.AccessToken)
+				o.Errors = append(o.Errors, fmt.Errorf("error validating token: %w: %s", err, token.AccessToken).Error())
 			} else {
 				rc, _, err := oidc.ExtractClaims[*oidc.IntrospectionResponse](validatedResponse)
 				if err != nil {
-					slog.Error("error extracting claims", "error", err)
+					slog.Error("error extracting claims", "error", err, "token", token.AccessToken)
 					o.Errors = append(o.Errors, fmt.Errorf("error extracting claims: %w", err).Error())
 				} else {
 					o.RegisteredClaims = rc
