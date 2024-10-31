@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"golang.org/x/oauth2"
@@ -21,6 +22,8 @@ type DebugStruct struct {
 	Errors           []string                   `json:",omitempty"`
 	RegisteredClaims validator.RegisteredClaims `json:",omitempty"`
 	Claims           jwt2.Claims                `json:",omitempty"`
+	AccessToken      string                     `json:",omitempty"`
+	Expiry           time.Time                  `json:",omitempty"`
 }
 
 func FlyValidator() (jwt.TokenValidator, error) {
@@ -57,10 +60,14 @@ func FlyDebug() http.HandlerFunc {
 
 		token, err = tokenSource.Token()
 
+		o.AccessToken = token.AccessToken
+		o.Expiry = token.Expiry
+
 		if err != nil {
 			slog.Error("error getting token", "error", err)
 			o.Errors = append(o.Errors, fmt.Errorf("error getting token: %w", err).Error())
 		}
+
 		if token != nil {
 			jwtToken, err := jwt2.ParseSigned(token.AccessToken)
 			if err != nil {
