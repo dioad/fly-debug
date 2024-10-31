@@ -9,6 +9,7 @@ import (
 
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"golang.org/x/oauth2"
+	jwt2 "gopkg.in/go-jose/go-jose.v2/jwt"
 
 	"github.com/dioad/net/http/authz/jwt"
 	"github.com/dioad/net/oidc"
@@ -19,6 +20,7 @@ type DebugStruct struct {
 	DecodedToken     interface{}                `json:",omitempty"`
 	Errors           []string                   `json:",omitempty"`
 	RegisteredClaims validator.RegisteredClaims `json:",omitempty"`
+	Claims           jwt2.Claims                `json:",omitempty"`
 }
 
 func FlyValidator() (jwt.TokenValidator, error) {
@@ -60,6 +62,21 @@ func FlyDebug() http.HandlerFunc {
 			o.Errors = append(o.Errors, fmt.Errorf("error getting token: %w", err).Error())
 		}
 		if token != nil {
+			jwtToken, err := jwt2.ParseSigned(token.AccessToken)
+			if err != nil {
+				slog.Error("error parsing token", "error", err, "token", token.AccessToken)
+				o.Errors = append(o.Errors, fmt.Errorf("error parsing token: %w: %s", err, token.AccessToken).Error())
+			} else {
+				claims := jwt2.Claims{}
+				err = jwtToken.UnsafeClaimsWithoutVerification(&claims)
+				if err != nil {
+					slog.Error("error decoding token", "error", err, "token", token.AccessToken)
+					o.Errors = append(o.Errors, fmt.Errorf("error decoding token: %w: %s", err, token.AccessToken).Error())
+				} else {
+					o.Claims = claims
+				}
+			}
+
 			validatedResponse, err := v.ValidateToken(r.Context(), token.AccessToken)
 			if err != nil {
 				slog.Error("error validating token", "error", err, "token", token.AccessToken)
